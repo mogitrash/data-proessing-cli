@@ -1,22 +1,17 @@
 import * as readline from 'node:readline/promises';
+import { navigationCommands } from './commands/navigation.js';
 import { ERRORS } from './constants.js';
+import { parseArgs } from './utils/argParser.js';
+import { countCommands } from './commands/count.js';
 
 const coreCommands = {
-  '.exit': (args, ctx) => {
+  '.exit': (ctx) => {
     ctx.exit();
-  },
-};
-
-const commands = {
-  up: async () => {},
-  cd: () => {
-    throw new Error();
   },
 };
 
 export const setupRepl = (ctx) => {
   const rl = readline.createInterface(process.stdin, process.stdout);
-  const getWorkingDir = ctx.getWorkingDir;
 
   const exit = () => {
     process.stdout.write('Thank you for using Data Processing CLI!\n');
@@ -27,23 +22,20 @@ export const setupRepl = (ctx) => {
   const replCxt = { exit, ...ctx };
 
   process.stdout.write('Welcome to Data Processing CLI!\n');
-  process.stdout.write(`You are currently in ${getWorkingDir()}\n`);
+  process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
   rl.prompt(true);
 
   const handleCommands = (input, ctx, ...configs) => {
     const merged = Object.assign({}, ...configs);
 
-    const trimmed = input.trim();
+    const { name, args } = parseArgs(input);
 
-    if (!trimmed) {
-      return;
-    }
+    if (!name) return;
 
-    const [name, ...args] = trimmed.split(/\s+/);
     const fn = merged[name];
 
     if (fn) {
-      return fn(args, ctx);
+      return fn(ctx, args);
     } else {
       throw new Error(ERRORS.INVALID_INPUT);
     }
@@ -57,10 +49,10 @@ export const setupRepl = (ctx) => {
     }
   };
 
-  rl.on('line', (input) => {
+  rl.on('line', async (input) => {
     try {
-      handleCommands(input, replCxt, commands, coreCommands);
-      process.stdout.write(`You are currently in ${getWorkingDir()}\n`);
+      await handleCommands(input, replCxt, coreCommands, navigationCommands, countCommands);
+      process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {
       handleError(error);
     }
