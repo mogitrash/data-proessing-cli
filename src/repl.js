@@ -6,6 +6,7 @@ import { countCommand } from './commands/count.js';
 import { hashCommands } from './commands/hash.js';
 import { csvToJsonCommand } from './commands/csvToJson.js';
 import { jsonToCsvCommand } from './commands/jsonToCsv.js';
+import { hashCompareCommand } from './commands/hashCompare.js';
 
 const coreCommands = {
   '.exit': (ctx) => {
@@ -63,6 +64,7 @@ export const setupRepl = (ctx) => {
         hashCommands,
         csvToJsonCommand,
         jsonToCsvCommand,
+        hashCompareCommand,
       );
       process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {
