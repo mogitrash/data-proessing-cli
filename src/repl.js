@@ -4,6 +4,7 @@ import { ERRORS } from './constants.js';
 import { parseArgs } from './utils/argParser.js';
 import { countCommands } from './commands/count.js';
 import { hashCommands } from './commands/hash.js';
+import { csvToJsonCommands } from './commands/csvToJson.js';
 
 const coreCommands = {
   '.exit': (ctx) => {
@@ -59,6 +60,7 @@ export const setupRepl = (ctx) => {
         navigationCommands,
         countCommands,
         hashCommands,
+        csvToJsonCommands,
       );
       process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {
