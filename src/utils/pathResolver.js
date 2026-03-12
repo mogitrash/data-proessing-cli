@@ -1,3 +1,9 @@
 import { resolve } from 'node:path';
 
-export const resolvePath = (workingDir, targetPath) => resolve(workingDir, targetPath);
+let ctx = null;
+
+export const setupPathResolver = (newCtx) => {
+  ctx = newCtx;
+};
+
+export const resolvePath = (targetPath) => resolve(ctx.getWorkingDir(), targetPath);

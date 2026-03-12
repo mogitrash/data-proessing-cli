@@ -4,11 +4,11 @@ import { resolvePath } from '../utils/pathResolver.js';
 
 export const navigationCommands = {
   up: (ctx) => {
-    ctx.setWorkingDir(resolvePath(ctx.getWorkingDir(), '../'));
+    ctx.setWorkingDir(resolvePath('../'));
   },
   cd: async (ctx, [path]) => {
     try {
-      const newPath = resolvePath(ctx.getWorkingDir(), path);
+      const newPath = resolvePath(path);
       await opendir(newPath);
       ctx.setWorkingDir(newPath);
     } catch {

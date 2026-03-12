@@ -1,42 +1,34 @@
 import { createReadStream } from 'node:fs';
 import { resolvePath } from '../utils/pathResolver.js';
 import { ERRORS } from '../constants.js';
+import { parseNamedArgs } from '../utils/argParser.js';
 
 export const countCommands = {
-  count: (ctx, [input]) =>
-    new Promise((resolve, reject) => {
-      let readStream;
-
-      try {
-        const path = resolvePath(ctx.getWorkingDir(), input);
-        readStream = createReadStream(path, 'utf-8');
-      } catch {
-        reject(new Error(ERRORS.OPERATION_FAILED));
-      }
+  count: async (ctx, args) => {
+    try {
+      const parsedArgs = parseNamedArgs(args);
+      const path = resolvePath(parsedArgs['input']);
+      const readStream = createReadStream(path, 'utf-8');
 
       let linesCount = 0;
       let wordCount = 0;
       let characters = 0;
 
-      readStream.on('data', (chunk) => {
+      for await (const chunk of readStream) {
         characters += chunk.length;
-        linesCount += chunk.split('').filter((value) => value === '\n').length;
+        linesCount += chunk.split('\n').length - 1;
         wordCount += chunk.split(/\s+/).filter(Boolean).length;
-      });
+      }
 
-      readStream.on('end', () => {
-        if (characters > 0) {
-          linesCount++;
-        }
+      if (characters > 0) {
+        linesCount++;
+      }
 
-        process.stdout.write(`Lines: ${linesCount}\n`);
-        process.stdout.write(`Words: ${wordCount}\n`);
-        process.stdout.write(`Characters: ${characters}\n`);
-        resolve();
-      });
-
-      readStream.on('error', (err) => {
-        reject(new Error(ERRORS.OPERATION_FAILED));
-      });
-    }),
+      process.stdout.write(`Lines: ${linesCount}\n`);
+      process.stdout.write(`Words: ${wordCount}\n`);
+      process.stdout.write(`Characters: ${characters}\n`);
+    } catch {
+      throw new Error(ERRORS.OPERATION_FAILED);
+    }
+  },
 };

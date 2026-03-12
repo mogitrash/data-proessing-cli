@@ -3,6 +3,7 @@ import { navigationCommands } from './commands/navigation.js';
 import { ERRORS } from './constants.js';
 import { parseArgs } from './utils/argParser.js';
 import { countCommands } from './commands/count.js';
+import { hashCommands } from './commands/hash.js';
 
 const coreCommands = {
   '.exit': (ctx) => {
@@ -51,7 +52,14 @@ export const setupRepl = (ctx) => {
 
   rl.on('line', async (input) => {
     try {
-      await handleCommands(input, replCxt, coreCommands, navigationCommands, countCommands);
+      await handleCommands(
+        input,
+        replCxt,
+        coreCommands,
+        navigationCommands,
+        countCommands,
+        hashCommands,
+      );
       process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {
       handleError(error);
