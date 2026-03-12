@@ -2,9 +2,10 @@ import * as readline from 'node:readline/promises';
 import { navigationCommands } from './commands/navigation.js';
 import { ERRORS } from './constants.js';
 import { parseArgs } from './utils/argParser.js';
-import { countCommands } from './commands/count.js';
+import { countCommand } from './commands/count.js';
 import { hashCommands } from './commands/hash.js';
-import { csvToJsonCommands } from './commands/csvToJson.js';
+import { csvToJsonCommand } from './commands/csvToJson.js';
+import { jsonToCsvCommand } from './commands/jsonToCsv.js';
 
 const coreCommands = {
   '.exit': (ctx) => {
@@ -58,9 +59,10 @@ export const setupRepl = (ctx) => {
         replCxt,
         coreCommands,
         navigationCommands,
-        countCommands,
+        countCommand,
         hashCommands,
-        csvToJsonCommands,
+        csvToJsonCommand,
+        jsonToCsvCommand,
       );
       process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {

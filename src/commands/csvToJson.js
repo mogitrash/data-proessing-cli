@@ -6,7 +6,7 @@ import { pipeline } from 'node:stream/promises';
 import { resolvePath } from '../utils/pathResolver.js';
 import { parseNamedArgs } from '../utils/argParser.js';
 
-export const csvToJsonCommands = {
+export const csvToJsonCommand = {
   csvToJson: async (ctx, args) => {
     const { input, output } = parseNamedArgs(args);
 

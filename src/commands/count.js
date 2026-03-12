@@ -3,11 +3,17 @@ import { resolvePath } from '../utils/pathResolver.js';
 import { ERRORS } from '../constants.js';
 import { parseNamedArgs } from '../utils/argParser.js';
 
-export const countCommands = {
+export const countCommand = {
   count: async (ctx, args) => {
+    const parsedArgs = parseNamedArgs(args);
+    const input = parsedArgs.input;
+
+    if (typeof input !== 'string') {
+      throw new Error(ERRORS.INVALID_INPUT);
+    }
+
     try {
-      const parsedArgs = parseNamedArgs(args);
-      const path = resolvePath(parsedArgs['input']);
+      const path = resolvePath(input);
       const readStream = createReadStream(path, 'utf-8');
 
       let linesCount = 0;

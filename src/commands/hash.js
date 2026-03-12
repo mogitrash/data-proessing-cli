@@ -12,7 +12,7 @@ export const hashCommands = {
     let { input, algorithm = 'sha256', save } = parseNamedArgs(args);
 
     if (typeof input !== 'string') {
-      throw new Error(ERRORS.OPERATION_FAILED);
+      throw new Error(ERRORS.INVALID_INPUT);
     }
 
     if (!SUPPORTED_ALGORITHMS.includes(algorithm)) {
