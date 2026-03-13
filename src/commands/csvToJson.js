@@ -1,13 +1,13 @@
 import { ERRORS } from '../constants.js';
 import { createReadStream } from 'node:fs';
-import { writeFile } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 import { Transform, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { resolvePath } from '../utils/pathResolver.js';
 import { parseNamedArgs } from '../utils/argParser.js';
 
 export const csvToJsonCommand = {
-  csvToJson: async (ctx, args) => {
+  'csv-to-json': async (ctx, args) => {
     const { input, output } = parseNamedArgs(args);
 
     if (typeof input !== 'string' || typeof output !== 'string') {
@@ -15,7 +15,6 @@ export const csvToJsonCommand = {
     }
 
     const readStream = createReadStream(resolvePath(input), { encoding: 'utf-8' });
-    const result = [];
     let isFirstLineRead = false;
     let fields = [];
     let buf = '';
@@ -75,24 +74,44 @@ export const csvToJsonCommand = {
       },
     });
 
-    const collectWritable = new Writable({
-      objectMode: true,
-      write(row, _encoding, callback) {
-        result.push(row);
-        callback();
-      },
-    });
+    class CollectWritable extends Writable {
+      constructor(fileName, options = {}) {
+        super({ ...options, objectMode: true });
+        this.result = [];
+        this.fileName = fileName;
+      }
+
+      _construct(cb) {
+        open(this.fileName, 'w')
+          .then((fd) => {
+            this.fd = fd;
+            cb();
+          })
+          .catch(() => {
+            cb(new Error(ERRORS.OPERATION_FAILED));
+          });
+      }
+
+      _write(obj, _encoding, cb) {
+        this.result.push(obj);
+        cb();
+      }
+
+      _final(cb) {
+        this.fd
+          .writeFile(JSON.stringify(this.result, null, 2))
+          .then(() => this.fd.close())
+          .then(() => cb())
+          .catch(() => {
+            cb(new Error(ERRORS.OPERATION_FAILED));
+          });
+      }
+    }
+
+    const collectWritable = new CollectWritable(resolvePath(output));
 
     try {
       await pipeline(readStream, csvToObjectTransform, collectWritable);
-    } catch {
-      throw new Error(ERRORS.OPERATION_FAILED);
-    }
-
-    const json = JSON.stringify(result, null, 2);
-
-    try {
-      await writeFile(resolvePath(output), json);
     } catch {
       throw new Error(ERRORS.OPERATION_FAILED);
     }

@@ -8,7 +8,7 @@ import { resolvePath } from '../utils/pathResolver.js';
 const SUPPORTED_ALGORITHMS = ['sha256', 'md5', 'sha512'];
 
 export const hashCompareCommand = {
-  hashCompare: async (ctx, args) => {
+  'hash-compare': async (ctx, args) => {
     let { input, algorithm = 'sha256', hash } = parseNamedArgs(args);
 
     if (typeof input !== 'string' || typeof hash !== 'string') {

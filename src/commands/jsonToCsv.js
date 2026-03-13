@@ -1,11 +1,11 @@
 import { readFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
 import { resolvePath } from '../utils/pathResolver.js';
 import { parseNamedArgs } from '../utils/argParser.js';
 import { ERRORS } from '../constants.js';
-import { writeFile } from 'node:fs/promises';
 
 export const jsonToCsvCommand = {
-  jsonToCsv: async (ctx, args) => {
+  'json-to-csv': async (ctx, args) => {
     const { input, output } = parseNamedArgs(args);
 
     if (typeof input !== 'string' || typeof output !== 'string') {
@@ -25,24 +25,39 @@ export const jsonToCsvCommand = {
       throw new Error(ERRORS.OPERATION_FAILED);
     }
 
-    let res = '';
-
-    if (arr.length > 0) {
-      const headers = Object.entries(arr[0])
-        .map(([key, _]) => key)
-        .join(',');
-      res += `${headers}\n`;
-
-      arr.forEach((value) => {
-        const line = Object.entries(value)
-          .map(([_, value]) => value)
-          .join(',');
-        res += `${line}\n`;
-      });
-    }
+    const outputPath = resolvePath(output);
+    const writeStream = createWriteStream(outputPath, { encoding: 'utf-8' });
 
     try {
-      await writeFile(resolvePath(output), res);
+      if (arr.length > 0) {
+        const headers = Object.entries(arr[0])
+          .map(([key]) => key)
+          .join(',');
+
+        if (!writeStream.write(`${headers}\n`)) {
+          await new Promise((resolve) => writeStream.once('drain', resolve));
+        }
+
+        for (const value of arr) {
+          const line = Object.entries(value)
+            .map(([, v]) => v)
+            .join(',');
+
+          if (!writeStream.write(`${line}\n`)) {
+            await new Promise((resolve) => writeStream.once('drain', resolve));
+          }
+        }
+      }
+
+      await new Promise((resolve, reject) => {
+        writeStream.end((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
     } catch {
       throw new Error(ERRORS.OPERATION_FAILED);
     }
