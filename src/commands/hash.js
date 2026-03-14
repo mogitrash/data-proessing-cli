@@ -16,7 +16,7 @@ export const hashCommands = {
     }
 
     if (!SUPPORTED_ALGORITHMS.includes(algorithm)) {
-      algorithm = 'sha256';
+      throw new Error(ERRORS.OPERATION_FAILED);
     }
 
     const hash = createHash(algorithm);

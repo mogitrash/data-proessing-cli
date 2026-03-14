@@ -16,22 +16,26 @@ export const navigationCommands = {
     }
   },
   ls: async (ctx) => {
-    const dirents = await readdir(ctx.getWorkingDir(), { withFileTypes: true });
+    try {
+      const dirents = await readdir(ctx.getWorkingDir(), { withFileTypes: true });
 
-    const folders = dirents.filter((dirent) => dirent.isDirectory());
-    const files = dirents.filter((dirent) => dirent.isFile());
+      const folders = dirents.filter((dirent) => dirent.isDirectory());
+      const files = dirents.filter((dirent) => dirent.isFile());
 
-    const compareFn = (a, b) => a.name.localeCompare(b.name);
+      const compareFn = (a, b) => a.name.localeCompare(b.name);
 
-    folders.sort(compareFn);
-    files.sort(compareFn);
+      folders.sort(compareFn);
+      files.sort(compareFn);
 
-    for (const folder of folders) {
-      process.stdout.write(`${folder.name} [folder]\n`);
-    }
+      for (const folder of folders) {
+        process.stdout.write(`${folder.name} [folder]\n`);
+      }
 
-    for (const file of files) {
-      process.stdout.write(`${file.name} [file]\n`);
+      for (const file of files) {
+        process.stdout.write(`${file.name} [file]\n`);
+      }
+    } catch {
+      throw new Error(ERRORS.OPERATION_FAILED);
     }
   },
 };

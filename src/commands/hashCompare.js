@@ -16,7 +16,7 @@ export const hashCompareCommand = {
     }
 
     if (!SUPPORTED_ALGORITHMS.includes(algorithm)) {
-      algorithm = 'sha256';
+      throw new Error(ERRORS.OPERATION_FAILED);
     }
 
     const hashObj = createHash(algorithm);
@@ -36,6 +36,8 @@ export const hashCompareCommand = {
 
     try {
       hashFile = await readFile(resolvePath(hash), { encoding: 'utf-8' });
+      hashFile = hashFile.trim();
+      hashFile = hashFile.toLowerCase();
     } catch {
       throw new Error(ERRORS.OPERATION_FAILED);
     }
