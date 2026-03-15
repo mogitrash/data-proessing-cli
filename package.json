@@ -1,0 +1,20 @@
+{
+  "name": "data-proessing-cli",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mogitrash/data-proessing-cli#readme",
+  "bugs": {
+    "url": "https://github.com/mogitrash/data-proessing-cli/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mogitrash/data-proessing-cli.git"
+  },
+  "license": "ISC",
+  "author": "Herman Vasilkouski",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  }
+}
