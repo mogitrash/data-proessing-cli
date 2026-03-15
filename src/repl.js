@@ -9,6 +9,7 @@ import { jsonToCsvCommand } from './commands/jsonToCsv.js';
 import { hashCompareCommand } from './commands/hashCompare.js';
 import { encryptCommand } from './commands/encrypt.js';
 import { decryptCommand } from './commands/decrypt.js';
+import { logStatsCommand } from './commands/log-stats.js';
 
 const coreCommands = {
   '.exit': (ctx) => {
@@ -69,6 +70,7 @@ export const setupRepl = (ctx) => {
         hashCompareCommand,
         encryptCommand,
         decryptCommand,
+        logStatsCommand,
       );
       process.stdout.write(`You are currently in ${ctx.getWorkingDir()}\n`);
     } catch (error) {

@@ -7,6 +7,10 @@ export const navigationCommands = {
     ctx.setWorkingDir(resolvePath('../'));
   },
   cd: async (ctx, [path]) => {
+    if (typeof path !== 'string') {
+      throw new Error(ERRORS.INVALID_INPUT);
+    }
+
     try {
       const newPath = resolvePath(path);
       await opendir(newPath);
